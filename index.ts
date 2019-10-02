@@ -59,7 +59,8 @@ const lineTo = (from: Position, to: Position) => {
 const drawCircle = (
   position: Position,
   angle: number,
-  active: boolean = false
+  active: boolean = false,
+  size: number,
 ) => {
   const { x, y } = position;
 
@@ -68,12 +69,12 @@ const drawCircle = (
 
   // Circle
   ctx.beginPath();
-  ctx.arc(0, 0, CIRCLE_RADIUS, 0, 2 * Math.PI);
+  ctx.arc(0, 0, size, 0, 2 * Math.PI);
   ctx.strokeStyle = active ? "red" : "black";
   ctx.stroke();
 
   // line
-  lineTo({ x: 0, y: 0 }, { x: CIRCLE_RADIUS, y: 0 });
+  lineTo({ x: 0, y: 0 }, { x: size, y: 0 });
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 };
@@ -92,7 +93,7 @@ const update = () => {
     if (distanceTo(character.position, character.target) <= character.size) {
       character.target = randomPosition();
     } else {
-      character.position = moveToAngle(character.position, angle, VELOCITY);
+      character.position = moveToAngle(character.position, angle, character.size/ 10);
     }
 
     characters.forEach(enemy => {
@@ -112,7 +113,7 @@ const update = () => {
       lineTo(character.position, character.target);
     }
 
-    drawCircle(character.position, angle, isActive);
+    drawCircle(character.position, angle, isActive, character.size);
   });
 
   requestAnimationFrame(update);
