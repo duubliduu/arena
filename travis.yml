@@ -1,0 +1,8 @@
+language: node_js
+
+node_js:
+  - "node"  # latest stable release
+  - "lts/*" # latest LTS release
+
+script:
+  - yarn run ci
