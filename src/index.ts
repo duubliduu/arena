@@ -1,7 +1,8 @@
 import { angleRadians, moveToAngle, distanceTo, isCollision } from "./helpers";
 import { CIRCLE_RADIUS, VELOCITY } from "./constants";
-import { GameObject, Position } from "./types";
+import { GameObject } from "./types";
 import Character from "./Character";
+import Position from "./Position";
 
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -13,16 +14,17 @@ const resize = () => {
 
 window.addEventListener("resize", resize);
 
-const randomPosition = (): Position => ({
-  x: Math.random() * window.innerWidth,
-  y: Math.random() * window.innerHeight
-});
+const randomPosition = (): Position =>
+  new Position(
+    Math.random() * window.innerWidth,
+    Math.random() * window.innerHeight
+  );
 
 const characters: GameObject[] = [];
 let selectedIndex: number = -1;
 
 window.addEventListener("mouseup", event => {
-  const target: Position = { x: event.pageX, y: event.pageY };
+  const target: Position = new Position(event.pageX, event.pageY);
   let isSelected: boolean = false;
 
   characters.forEach((character, index) => {
@@ -60,7 +62,7 @@ const drawCircle = (
   position: Position,
   angle: number,
   active: boolean = false,
-  size: number,
+  size: number
 ) => {
   const { x, y } = position;
 
@@ -74,7 +76,7 @@ const drawCircle = (
   ctx.stroke();
 
   // line
-  lineTo({ x: 0, y: 0 }, { x: size, y: 0 });
+  lineTo(new Position(), new Position(size));
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 };
@@ -93,7 +95,11 @@ const update = () => {
     if (distanceTo(character.position, character.target) <= character.size) {
       character.target = randomPosition();
     } else {
-      character.position = moveToAngle(character.position, angle, character.size/ 10);
+      character.position = moveToAngle(
+        character.position,
+        angle,
+        character.size / 10
+      );
     }
 
     characters.forEach(enemy => {

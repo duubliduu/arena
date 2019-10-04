@@ -1,4 +1,5 @@
-import { GameObject, Position } from "./types";
+import { GameObject } from "./types";
+import Position from "./Position";
 
 export const angleRadians = (from: Position, to: Position) => {
   const { x: x1, y: y1 } = from;
@@ -7,8 +8,8 @@ export const angleRadians = (from: Position, to: Position) => {
 };
 
 export const angleDegrees = (from, to) => {
-  const [x1, y1] = from;
-  const [x2, y2] = to;
+  const { x: x1, y: y1 } = from;
+  const { x: x2, y: y2 } = to;
   return (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
 };
 
@@ -17,10 +18,10 @@ export const moveToAngle = (
   angle: number,
   distance: number
 ) => {
-  return {
-    x: position.x + Math.cos(angle) * distance,
-    y: position.y + Math.sin(angle) * distance
-  };
+  return new Position(
+    position.x + Math.cos(angle) * distance,
+    position.y + Math.sin(angle) * distance
+  );
 };
 
 export const distanceTo = (from: Position, to: Position) => {

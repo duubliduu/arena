@@ -1,5 +1,4 @@
-// TODO: rename to Vector also use real Vector library
-export type Position = { x: number; y: number };
+import Position from "./Position";
 
 export interface GameObject {
   position: Position;
