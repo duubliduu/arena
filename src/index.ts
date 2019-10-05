@@ -1,8 +1,8 @@
 import { angleRadians, moveToAngle, distanceTo, isCollision } from "./helpers";
 import { CIRCLE_RADIUS } from "./constants";
-import { GameObject } from "./types";
 import Character from "./Character";
 import Position from "./Position";
+import CharacterFactory from "./CharacterFactory";
 
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -20,7 +20,25 @@ const randomPosition = (): Position =>
     Math.random() * window.innerHeight
   );
 
-const characters: GameObject[] = [];
+const characters: Character[] = CharacterFactory.create(10);
+
+// Randomize position
+characters.forEach(character => {
+  character.position = randomPosition();
+});
+
+function randomItem<T>(items: T[], currentIndex): T {
+  let index = -1;
+  do {
+    index = Math.round(Math.random() * items.length);
+  } while (index === currentIndex);
+  return items[index];
+}
+
+characters.forEach((character, index) => {
+  character.target = randomItem<Character>(characters, index);
+});
+
 let selectedIndex: number = -1;
 
 window.addEventListener("mouseup", event => {
@@ -38,18 +56,9 @@ window.addEventListener("mouseup", event => {
   });
 
   if (!isSelected) {
-    characters[selectedIndex].target = target;
+    //characters[selectedIndex].target = target;
   }
 });
-
-const init = () => {
-  for (let i = 0; i < 10; i++) {
-    const character = new Character(randomPosition());
-    character.target = randomPosition();
-    characters.push(character);
-  }
-  requestAnimationFrame(update);
-};
 
 const lineTo = (from: Position, to: Position) => {
   ctx.beginPath();
@@ -89,39 +98,46 @@ const update = () => {
   clearRect();
 
   characters.forEach((character, index) => {
-    const angle = angleRadians(character.position, character.target);
     const isActive = selectedIndex === index;
 
-    if (distanceTo(character.position, character.target) <= character.size) {
-      character.target = randomPosition();
-    } else {
-      character.position = moveToAngle(
+    if (character.target) {
+      character.angle = angleRadians(
         character.position,
-        angle,
-        character.size / 10
+        character.target.position
       );
     }
+
+    character.position = moveToAngle(
+      character.position,
+      character.angle,
+      character.speed
+    );
 
     characters.forEach(enemy => {
       if (enemy !== character) {
         if (isCollision(enemy, character)) {
           character.position = moveToAngle(
             character.position,
-            angle + Math.PI,
+            character.angle + Math.PI,
             1
           );
-          character.target = randomPosition();
+
+          character.target = randomItem(characters, index);
         }
       }
     });
 
-    if (isActive) {
-      lineTo(character.position, character.target);
+    if (isActive && character.target) {
+      lineTo(character.position, character.target.position);
     }
 
-    drawCircle(character.position, angle, isActive, character.size);
+    drawCircle(character.position, character.angle, isActive, character.size);
   });
 
+  requestAnimationFrame(update);
+};
+
+const init = () => {
   requestAnimationFrame(update);
 };
 
