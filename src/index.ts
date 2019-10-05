@@ -1,5 +1,5 @@
 import { angleRadians, moveToAngle, distanceTo, isCollision } from "./helpers";
-import { CIRCLE_RADIUS, VELOCITY } from "./constants";
+import { CIRCLE_RADIUS } from "./constants";
 import { GameObject } from "./types";
 import Character from "./Character";
 import Position from "./Position";

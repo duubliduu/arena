@@ -1,6 +1,13 @@
-import { angleRadians, angleDegrees, moveToAngle, distanceTo } from "./helpers";
+import {
+  angleRadians,
+  angleDegrees,
+  moveToAngle,
+  distanceTo,
+  isCollision
+} from "./helpers";
 import Position, { UP, RIGHT, DOWN, LEFT } from "./Position";
 import { Radians } from "./constants";
+import Character from "./Character";
 
 describe("angleRadians", () => {
   it("should return correct angle in radians", () => {
@@ -44,5 +51,18 @@ describe("distanceTo", () => {
     expect(distanceTo(new Position(), RIGHT)).toEqual(1);
     expect(distanceTo(new Position(), DOWN)).toEqual(1);
     expect(distanceTo(new Position(), LEFT)).toEqual(1);
+  });
+});
+
+describe("isCollision", () => {
+  it("should return true when characters are touching", () => {
+    const a = new Character;
+    const b = new Character;
+    expect(isCollision(a, b)).toEqual(true);
+  });
+  it("should return true when characters are NOT touching", () => {
+    const a = new Character(40);
+    const b = new Character;
+    expect(isCollision(a, b)).toEqual(false);
   });
 });
