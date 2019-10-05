@@ -7,9 +7,15 @@ class Character implements GameObject {
   size: number = 8 + Math.ceil(Math.random() * 10);
   target: Position = null;
 
-  constructor(position: Position) {
-    this.position = position;
-    this.target = position;
+  constructor(x: number | Position = 0, y: number = 0) {
+    if (typeof x === "number") {
+      const position = new Position(x, y);
+      this.position = position;
+      this.target = position;
+    } else {
+      this.position = x;
+      this.target = x;
+    }
   }
 }
 
