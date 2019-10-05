@@ -4,5 +4,7 @@ export interface GameObject {
   position: Position;
   isActive: boolean;
   size: number;
-  target: Position;
+  target: GameObject;
+  angle: number;
+  speed: number;
 }
