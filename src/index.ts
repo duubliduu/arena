@@ -67,25 +67,32 @@ const lineTo = (from: Position, to: Position) => {
   ctx.stroke();
 };
 
-const drawCircle = (
-  position: Position,
-  angle: number,
-  active: boolean = false,
-  size: number
-) => {
-  const { x, y } = position;
+const drawCircle = (x = 0, y = 0, radius = 10, color = "black") => {
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, 2 * Math.PI);
+  ctx.strokeStyle = color;
+  ctx.stroke();
+};
+
+const drawCharacter = (character: Character) => {
+  const {
+    position: { x, y },
+    angle,
+    size,
+    reach
+  } = character;
 
   ctx.translate(x, y);
   ctx.rotate(angle);
 
   // Circle
-  ctx.beginPath();
-  ctx.arc(0, 0, size, 0, 2 * Math.PI);
-  ctx.strokeStyle = active ? "red" : "black";
-  ctx.stroke();
+  drawCircle(0, 0, size);
 
   // line
   lineTo(new Position(), new Position(size));
+
+  // Danger Zone
+  drawCircle(0, 0, reach, "red");
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 };
@@ -131,7 +138,7 @@ const update = () => {
       lineTo(character.position, character.target.position);
     }
 
-    drawCircle(character.position, character.angle, isActive, character.size);
+    drawCharacter(character);
   });
 
   requestAnimationFrame(update);

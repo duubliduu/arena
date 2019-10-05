@@ -21,6 +21,10 @@ class Character implements GameObject {
   get speed(): number {
     return this.size / 10;
   }
+
+  get reach(): number {
+    return this.size * 2;
+  }
 }
 
 export default Character;
