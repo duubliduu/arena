@@ -1,13 +1,13 @@
 import { GameObject } from "./types";
 import Position from "./Position";
 
-export const angleRadians = (from: Position, to: Position) => {
+export const angleRadians = (from: Position, to: Position): number => {
   const { x: x1, y: y1 } = from;
   const { x: x2, y: y2 } = to;
   return Math.atan2(y2 - y1, x2 - x1);
 };
 
-export const angleDegrees = (from, to) => {
+export const angleDegrees = (from: Position, to: Position): number => {
   const { x: x1, y: y1 } = from;
   const { x: x2, y: y2 } = to;
   return (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
