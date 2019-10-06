@@ -57,10 +57,10 @@ window.addEventListener("mouseup", event => {
     }
   });
 
-  if (selectedIndex === clickedIndex) {
+  if (selectedIndex !== -1 && selectedIndex === clickedIndex) {
     // Deselect currently selected character
     selectedIndex = -1;
-  } else if (selectedIndex === -1) {
+  } else if (selectedIndex === -1 && clickedIndex !== -1) {
     // Select this character
     selectedIndex = clickedIndex;
   } else if (selectedIndex !== -1 && clickedIndex === -1) {
