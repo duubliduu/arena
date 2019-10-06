@@ -1,4 +1,4 @@
-export const CIRCLE_RADIUS = 10;
+export const TOUCH_RADIUS = 20;
 export const VELOCITY = 1;
 
 export const Radians = {
