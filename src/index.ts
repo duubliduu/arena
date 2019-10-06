@@ -1,5 +1,5 @@
 import { angleRadians, moveToAngle, distanceTo, isCollision } from "./helpers";
-import { CIRCLE_RADIUS } from "./constants";
+import { TOUCH_RADIUS } from "./constants";
 import Character from "./Character";
 import Position from "./Position";
 import CharacterFactory from "./CharacterFactory";
@@ -22,10 +22,11 @@ const randomPosition = (): Position =>
 
 const characters: Character[] = CharacterFactory.create(10);
 
-// Randomize position
-characters.forEach(character => {
-  character.position = randomPosition();
-});
+const setRandomPosition = () => {
+  characters.forEach(character => {
+    character.position = randomPosition();
+  });
+};
 
 function randomItem<T>(items: T[], currentIndex): T {
   let index = -1;
@@ -35,28 +36,41 @@ function randomItem<T>(items: T[], currentIndex): T {
   return items[index];
 }
 
-characters.forEach((character, index) => {
-  character.target = randomItem<Character>(characters, index);
-});
+const setRandomTarget = () => {
+  characters.forEach((character, index) => {
+    character.target = randomItem<Character>(characters, index);
+  });
+};
 
 let selectedIndex: number = -1;
 
 window.addEventListener("mouseup", event => {
   const target: Position = new Position(event.pageX, event.pageY);
-  let isSelected: boolean = false;
+  let clickedIndex = -1;
 
   characters.forEach((character, index) => {
     if (
       distanceTo(character.position, target) <=
-      character.size + CIRCLE_RADIUS
+      character.size + TOUCH_RADIUS
     ) {
-      isSelected = true;
-      selectedIndex = index;
+      clickedIndex = index;
     }
   });
 
-  if (!isSelected) {
-    //characters[selectedIndex].target = target;
+  if (selectedIndex === clickedIndex) {
+    // Deselect currently selected character
+    selectedIndex = -1;
+  } else if (selectedIndex === -1) {
+    // Select this character
+    selectedIndex = clickedIndex;
+  } else if (selectedIndex !== -1 && clickedIndex === -1) {
+    // Character is selected but clicked character is not clicked
+    // Create character to this point as a target
+    characters[selectedIndex].target = new Character(target);
+  } else if (selectedIndex !== -1 && selectedIndex !== clickedIndex) {
+    // Clicked character is not selected character
+    // Set clicked character as a target
+    characters[selectedIndex].target = characters[clickedIndex];
   }
 });
 
@@ -74,7 +88,7 @@ const drawCircle = (x = 0, y = 0, radius = 10, color = "black") => {
   ctx.stroke();
 };
 
-const drawCharacter = (character: Character) => {
+const drawCharacter = (character: Character, isActive: boolean = false) => {
   const {
     position: { x, y },
     angle,
@@ -86,13 +100,15 @@ const drawCharacter = (character: Character) => {
   ctx.rotate(angle);
 
   // Circle
-  drawCircle(0, 0, size);
+  drawCircle(0, 0, size, isActive ? "red" : "black");
 
   // line
   lineTo(new Position(), new Position(size));
 
-  // Danger Zone
-  drawCircle(0, 0, reach, "red");
+  if (isActive) {
+    // Danger Zone
+    drawCircle(0, 0, reach, "red");
+  }
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 };
@@ -112,24 +128,19 @@ const update = () => {
         character.position,
         character.target.position
       );
+      character.position = moveToAngle(
+        character.position,
+        character.angle,
+        character.speed
+      );
+      if (isCollision(character, character.target)) {
+        character.target = null;
+      }
     }
-
-    character.position = moveToAngle(
-      character.position,
-      character.angle,
-      character.speed
-    );
 
     characters.forEach(enemy => {
       if (enemy !== character) {
         if (isCollision(enemy, character)) {
-          character.position = moveToAngle(
-            character.position,
-            character.angle + Math.PI,
-            1
-          );
-
-          character.target = randomItem(characters, index);
         }
       }
     });
@@ -138,13 +149,15 @@ const update = () => {
       lineTo(character.position, character.target.position);
     }
 
-    drawCharacter(character);
+    drawCharacter(character, isActive);
   });
 
   requestAnimationFrame(update);
 };
 
 const init = () => {
+  setRandomPosition();
+  setRandomTarget();
   requestAnimationFrame(update);
 };
 
