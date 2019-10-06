@@ -1,4 +1,10 @@
-import { angleRadians, moveToAngle, distanceTo, isCollision } from "./helpers";
+import {
+  angleRadians,
+  moveToAngle,
+  distanceTo,
+  isCollision,
+  angleDegrees
+} from "./helpers";
 import { TOUCH_RADIUS } from "./constants";
 import Character from "./Character";
 import Position from "./Position";
@@ -108,6 +114,14 @@ const drawCharacter = (character: Character, isActive: boolean = false) => {
   if (isActive) {
     // Danger Zone
     drawCircle(0, 0, reach, "red");
+    lineTo(
+      moveToAngle(new Position(), -Math.PI / 2, size),
+      moveToAngle(new Position(), -Math.PI / 2, reach)
+    );
+    lineTo(
+      moveToAngle(new Position(), +Math.PI / 2, size),
+      moveToAngle(new Position(), +Math.PI / 2, reach)
+    );
   }
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -140,7 +154,12 @@ const update = () => {
 
     characters.forEach(enemy => {
       if (enemy !== character) {
-        if (isCollision(enemy, character)) {
+        if (isActive && character.target) {
+          const angleToEnemy = angleDegrees(character.position, enemy.position);
+          const angle = (character.angle * 180) / Math.PI;
+          const difference =
+            180 - Math.abs(Math.abs(angle - angleToEnemy) - 180);
+          enemy.isVisible = difference <= 90;
         }
       }
     });
@@ -149,7 +168,9 @@ const update = () => {
       lineTo(character.position, character.target.position);
     }
 
-    drawCharacter(character, isActive);
+    if (character.isVisible) {
+      drawCharacter(character, isActive);
+    }
   });
 
   requestAnimationFrame(update);

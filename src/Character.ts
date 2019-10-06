@@ -8,6 +8,7 @@ class Character implements GameObject {
   size: number = 8 + Math.ceil(Math.random() * 10);
   target: Character = null;
   angle: number;
+  isVisible: boolean = true;
 
   constructor(x: number | Position = 0, y: number = 0) {
     if (typeof x === "number") {

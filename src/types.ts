@@ -7,4 +7,5 @@ export interface GameObject {
   target: GameObject;
   angle: number;
   speed: number;
+  isVisible: boolean;
 }
