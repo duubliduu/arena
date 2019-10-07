@@ -94,6 +94,13 @@ const drawCircle = (x = 0, y = 0, radius = 10, color = "black") => {
   ctx.stroke();
 };
 
+const drawHalfCircle = (x = 0, y = 0, radius = 10, color = "black") => {
+  ctx.beginPath();
+  ctx.arc(x, y, radius, -Math.PI / 2, Math.PI / 2);
+  ctx.strokeStyle = color;
+  ctx.stroke();
+};
+
 const drawCharacter = (character: Character, isActive: boolean = false) => {
   const {
     position: { x, y },
@@ -113,7 +120,7 @@ const drawCharacter = (character: Character, isActive: boolean = false) => {
 
   if (isActive) {
     // Danger Zone
-    drawCircle(0, 0, reach, "red");
+    drawHalfCircle(0, 0, reach, "red");
     lineTo(
       moveToAngle(new Position(), -Math.PI / 2, size),
       moveToAngle(new Position(), -Math.PI / 2, reach)
