@@ -7,3 +7,5 @@ export const Radians = {
   DOWN: Math.PI / 2,
   LEFT: Math.PI
 };
+
+export const CONE_OF_SIGHT = 90;

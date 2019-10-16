@@ -6,7 +6,7 @@ import {
   angleDegrees,
   angleToTarget
 } from "./helpers";
-import { TOUCH_RADIUS } from "./constants";
+import { CONE_OF_SIGHT, TOUCH_RADIUS } from "./constants";
 import Character from "./Character";
 import Position from "./Position";
 import CharacterFactory from "./CharacterFactory";
@@ -139,11 +139,24 @@ const clearRect = () => {
   ctx.clearRect(0, 0, window.innerWidth, window.innerHeight); // clear canvas
 };
 
+const updateVisibility = () => {
+  characters.forEach((character, index) => {
+    if (selectedIndex === -1) {
+      character.isVisible = true;
+    } else if (selectedIndex !== index) {
+      const selectedCharacter = characters[selectedIndex];
+      const difference = angleToTarget(selectedCharacter, character);
+      character.isVisible = difference <= CONE_OF_SIGHT;
+    }
+  });
+};
+
 const update = () => {
   clearRect();
+  updateVisibility();
 
   characters.forEach((character, index) => {
-    const isActive = selectedIndex === index;
+    const isActive: boolean = selectedIndex === index;
 
     if (character.target) {
       character.angle = angleRadians(
@@ -159,15 +172,6 @@ const update = () => {
         character.target = null;
       }
     }
-
-    characters.forEach(enemy => {
-      if (enemy !== character) {
-        if (isActive && character.target) {
-          const difference = angleToTarget(character, enemy);
-          enemy.isVisible = difference <= 90;
-        }
-      }
-    });
 
     if (isActive && character.target) {
       lineTo(character.position, character.target.position);
