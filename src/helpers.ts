@@ -35,3 +35,12 @@ export const isCollision = (a: GameObject, b: GameObject): boolean => {
   const distance = distanceTo(a.position, b.position);
   return distance <= a.size + b.size;
 };
+
+export const angleToTarget = (
+  character: GameObject,
+  target: GameObject
+): number => {
+  const angleToEnemy = angleDegrees(character.position, target.position);
+  const angle = (character.angle * 180) / Math.PI;
+  return 180 - Math.abs(Math.abs(angle - angleToEnemy) - 180);
+};

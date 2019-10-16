@@ -3,7 +3,8 @@ import {
   moveToAngle,
   distanceTo,
   isCollision,
-  angleDegrees
+  angleDegrees,
+  angleToTarget
 } from "./helpers";
 import { TOUCH_RADIUS } from "./constants";
 import Character from "./Character";
@@ -162,10 +163,7 @@ const update = () => {
     characters.forEach(enemy => {
       if (enemy !== character) {
         if (isActive && character.target) {
-          const angleToEnemy = angleDegrees(character.position, enemy.position);
-          const angle = (character.angle * 180) / Math.PI;
-          const difference =
-            180 - Math.abs(Math.abs(angle - angleToEnemy) - 180);
+          const difference = angleToTarget(character, enemy);
           enemy.isVisible = difference <= 90;
         }
       }
