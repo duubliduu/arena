@@ -24,7 +24,7 @@ class Character implements GameObject {
   }
 
   get reach(): number {
-    return this.size * 2;
+    return this.size + this.size * 2;
   }
 }
 

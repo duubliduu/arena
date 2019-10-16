@@ -3,12 +3,11 @@ import {
   moveToAngle,
   distanceTo,
   isCollision,
-  angleDegrees,
   angleToTarget
 } from "./helpers";
 import { CONE_OF_SIGHT, TOUCH_RADIUS } from "./constants";
 import Character from "./Character";
-import Position from "./Position";
+import Position, { ZERO } from "./Position";
 import CharacterFactory from "./CharacterFactory";
 
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
@@ -95,11 +94,19 @@ const drawCircle = (x = 0, y = 0, radius = 10, color = "black") => {
   ctx.stroke();
 };
 
-const drawHalfCircle = (x = 0, y = 0, radius = 10, color = "black") => {
+const drawCone = (x = 0, y = 0, radius = 10, color = "black", offset = 0) => {
   ctx.beginPath();
-  ctx.arc(x, y, radius, -Math.PI / 2, Math.PI / 2);
+  ctx.arc(x, y, radius, -Math.PI / 4, Math.PI / 4);
   ctx.strokeStyle = color;
   ctx.stroke();
+  lineTo(
+    moveToAngle(ZERO, -Math.PI / 4, offset),
+    moveToAngle(ZERO, -Math.PI / 4, radius)
+  );
+  lineTo(
+    moveToAngle(ZERO, +Math.PI / 4, offset),
+    moveToAngle(ZERO, +Math.PI / 4, radius)
+  );
 };
 
 const drawCharacter = (character: Character, isActive: boolean = false) => {
@@ -121,15 +128,7 @@ const drawCharacter = (character: Character, isActive: boolean = false) => {
 
   if (isActive) {
     // Danger Zone
-    drawHalfCircle(0, 0, reach, "red");
-    lineTo(
-      moveToAngle(new Position(), -Math.PI / 2, size),
-      moveToAngle(new Position(), -Math.PI / 2, reach)
-    );
-    lineTo(
-      moveToAngle(new Position(), +Math.PI / 2, size),
-      moveToAngle(new Position(), +Math.PI / 2, reach)
-    );
+    drawCone(0, 0, reach, "red", size);
   }
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
