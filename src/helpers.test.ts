@@ -3,7 +3,7 @@ import {
   angleDegrees,
   moveToAngle,
   distanceTo,
-  isCollision
+  willCollide
 } from "./helpers";
 import Position, { UP, RIGHT, DOWN, LEFT } from "./Position";
 import { Radians } from "./constants";
@@ -54,15 +54,15 @@ describe("distanceTo", () => {
   });
 });
 
-describe("isCollision", () => {
+describe("willCollide", () => {
   it("should return true when characters are touching", () => {
     const a = new Character;
     const b = new Character;
-    expect(isCollision(a, b)).toEqual(true);
+    expect(willCollide(a, b)).toEqual(true);
   });
   it("should return true when characters are NOT touching", () => {
     const a = new Character(40);
     const b = new Character;
-    expect(isCollision(a, b)).toEqual(false);
+    expect(willCollide(a, b)).toEqual(false);
   });
 });

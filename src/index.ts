@@ -2,16 +2,20 @@ import {
   angleRadians,
   moveToAngle,
   distanceTo,
-  isCollision,
-  angleToTarget
+  willCollide,
+  angleToTarget,
+  calculateVelocity
 } from "./helpers";
 import { CONE_OF_SIGHT, TOUCH_RADIUS } from "./constants";
 import Character from "./Character";
 import Position, { ZERO } from "./Position";
 import CharacterFactory from "./CharacterFactory";
+import { cachedDataVersionTag } from "v8";
 
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+let frameRate = 1;
+let updatedAt = +new Date();
 
 const resize = () => {
   canvas.width = window.innerWidth;
@@ -44,7 +48,7 @@ function randomItem<T>(items: T[], currentIndex): T {
 
 const setRandomTarget = () => {
   characters.forEach((character, index) => {
-    character.target = randomItem<Character>(characters, index);
+    character.target = randomItem<Character>(characters, index).position;
   });
 };
 
@@ -72,11 +76,11 @@ window.addEventListener("mouseup", event => {
   } else if (selectedIndex !== -1 && clickedIndex === -1) {
     // Character is selected but clicked character is not clicked
     // Create character to this point as a target
-    characters[selectedIndex].target = new Character(target);
+    characters[selectedIndex].target = target;
   } else if (selectedIndex !== -1 && selectedIndex !== clickedIndex) {
     // Clicked character is not selected character
     // Set clicked character as a target
-    characters[selectedIndex].target = characters[clickedIndex];
+    characters[selectedIndex].target = characters[clickedIndex].position;
   }
 });
 
@@ -139,41 +143,92 @@ const clearCanvas = () => {
 };
 
 const updateVisibility = () => {
+  const selectedCharacter = characters[selectedIndex];
+
   characters.forEach((character, index) => {
     if (selectedIndex === -1) {
       character.isVisible = true;
     } else if (selectedIndex !== index) {
-      const selectedCharacter = characters[selectedIndex];
       const difference = angleToTarget(selectedCharacter, character);
       character.isVisible = difference <= CONE_OF_SIGHT / 2;
     }
   });
 };
 
+const attackTarget = (attacker: Character, defender: Character) => {
+  console.log("BOOM");
+};
+
 const update = () => {
+  const tick = +new Date() - updatedAt;
+  updatedAt = +new Date();
+  frameRate = 1000 / tick; // frames per second
+
   clearCanvas();
   updateVisibility();
 
-  characters.forEach((character, index) => {
-    const isActive: boolean = selectedIndex === index;
+  // Filter out dead characters
 
-    if (character.target) {
-      character.angle = angleRadians(
-        character.position,
-        character.target.position
-      );
-      character.position = moveToAngle(
-        character.position,
-        character.angle,
-        character.speed
-      );
-      if (isCollision(character, character.target)) {
-        character.target = null;
-      }
+  characters.forEach((character, index) => {
+    if (character.hitPoints<= 0) {
+      return;
+    }
+    const isActive: boolean = selectedIndex === index;
+    const reduction = 1 / frameRate;
+
+    // reduce cool-down if any
+    if (character.coolDown > 0) {
+      character.reduceCoolDown(reduction);
     }
 
+    const distanceToTarget =
+      character.target && distanceTo(character.position, character.target);
+    if (distanceToTarget < 1) {
+      character.target = null;
+    }
+
+    // Turn to target
+    if (character.target) {
+      character.angle = angleRadians(character.position, character.target);
+    }
+
+    character.velocity = calculateVelocity(character.angle, character.speed);
+
+    let isColliding: boolean = false;
+    let targetEnemy = null;
+
+    // Resolve collision
+    // Resolve target
+    characters.forEach((enemy, enemyIndex) => {
+      if (index !== enemyIndex && enemy.hitPoints > 0) {
+        const distanceToEnemy: number = distanceTo(
+          character.position,
+          enemy.position
+        );
+        const isInReach: boolean =
+          angleToTarget(character, enemy) <= 45 &&
+          distanceToEnemy <= character.reach;
+        if (isInReach && !character.coolDown) {
+          targetEnemy = enemy;
+        }
+        if (willCollide(character, enemy)) {
+          isColliding = true;
+        }
+      }
+    });
+
+    if (isColliding || targetEnemy || !character.target) {
+      character.velocity = ZERO;
+    }
+
+    if (targetEnemy) {
+      character.attackTarget(targetEnemy);
+    }
+
+    character.update();
+
     if (isActive && character.target) {
-      lineTo(character.position, character.target.position);
+      lineTo(character.position, character.target);
     }
 
     if (character.isVisible) {
@@ -183,6 +238,10 @@ const update = () => {
 
   requestAnimationFrame(update);
 };
+
+setInterval(() => {
+  console.log(frameRate);
+}, 1000);
 
 const init = () => {
   setRandomPosition();

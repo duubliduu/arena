@@ -1,30 +1,45 @@
-import { GameObject } from "./types";
 import Position from "./Position";
 import { Radians } from "./constants";
+import GameObject from "./GameObject";
+import { calculateVelocity } from "./helpers";
 
-class Character implements GameObject {
-  position: Position = null;
+class Character extends GameObject {
   isActive: boolean = false;
   size: number = 8 + Math.ceil(Math.random() * 10);
-  target: Character = null;
-  angle: number;
-  isVisible: boolean = true;
-
-  constructor(x: number | Position = 0, y: number = 0) {
-    if (typeof x === "number") {
-      this.position = new Position(x, y);
-    } else {
-      this.position = x;
+  target: Position = null;
+  coolDown: number = 0;
+  arms = [
+    {
+      damage: 10,
+      coolDown: 1, // seconds
+      reach: 10
     }
-    this.angle = Radians.RIGHT;
-  }
+  ];
+  hitPoints = 30;
 
   get speed(): number {
     return this.size / 10;
   }
 
   get reach(): number {
-    return this.size + this.size * 2;
+    return this.size + this.size + this.arms[0].reach;
+  }
+
+  get damage(): number {
+    return this.size + this.arms[0].damage;
+  }
+
+  reduceCoolDown(reduction: number) {
+    this.coolDown -= reduction;
+    if (this.coolDown < 0) {
+      this.coolDown = 0;
+    }
+  }
+
+  attackTarget(enemy: Character) {
+    enemy.hitPoints -= this.damage;
+    console.log(enemy.hitPoints);
+    this.coolDown = this.arms[0].coolDown;
   }
 }
 
