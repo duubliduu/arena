@@ -145,7 +145,7 @@ const updateVisibility = () => {
     } else if (selectedIndex !== index) {
       const selectedCharacter = characters[selectedIndex];
       const difference = angleToTarget(selectedCharacter, character);
-      character.isVisible = difference <= CONE_OF_SIGHT;
+      character.isVisible = difference <= CONE_OF_SIGHT / 2;
     }
   });
 };

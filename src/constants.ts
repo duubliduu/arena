@@ -8,4 +8,4 @@ export const Radians = {
   LEFT: Math.PI
 };
 
-export const CONE_OF_SIGHT = 90;
+export const CONE_OF_SIGHT = 180;
