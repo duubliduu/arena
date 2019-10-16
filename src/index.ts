@@ -134,8 +134,8 @@ const drawCharacter = (character: Character, isActive: boolean = false) => {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 };
 
-const clearRect = () => {
-  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight); // clear canvas
+const clearCanvas = () => {
+  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 };
 
 const updateVisibility = () => {
@@ -151,7 +151,7 @@ const updateVisibility = () => {
 };
 
 const update = () => {
-  clearRect();
+  clearCanvas();
   updateVisibility();
 
   characters.forEach((character, index) => {
