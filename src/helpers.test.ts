@@ -3,7 +3,7 @@ import {
   angleDegrees,
   moveToAngle,
   distanceTo,
-  willCollide
+  willCollide,
   isInReach
 } from "./helpers";
 import Position, { UP, RIGHT, DOWN, LEFT } from "./Position";

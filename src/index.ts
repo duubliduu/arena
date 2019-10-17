@@ -4,7 +4,7 @@ import {
   distanceTo,
   willCollide,
   angleToTarget,
-  calculateVelocity
+  calculateVelocity,
   isInReach,
 } from "./helpers";
 import { CONE_OF_SIGHT, TOUCH_RADIUS } from "./constants";
@@ -28,7 +28,7 @@ window.addEventListener("resize", resize);
 const randomPosition = (): Position =>
   new Position(
     Math.random() * window.innerWidth,
-    Math.random() * window.innerHeight
+    Math.random() * window.innerHeight,
   );
 
 const characters: Character[] = CharacterFactory.create(10);
@@ -106,11 +106,11 @@ const drawCone = (x = 0, y = 0, radius = 10, color = "black", offset = 0) => {
   ctx.stroke();
   lineTo(
     moveToAngle(ZERO, -Math.PI / 4, offset),
-    moveToAngle(ZERO, -Math.PI / 4, radius)
+    moveToAngle(ZERO, -Math.PI / 4, radius),
   );
   lineTo(
     moveToAngle(ZERO, +Math.PI / 4, offset),
-    moveToAngle(ZERO, +Math.PI / 4, radius)
+    moveToAngle(ZERO, +Math.PI / 4, radius),
   );
 };
 
@@ -119,7 +119,7 @@ const drawCharacter = (character: Character, isActive: boolean = false) => {
     position: { x, y },
     angle,
     size,
-    reach
+    reach,
   } = character;
 
   ctx.translate(x, y);
@@ -171,7 +171,7 @@ const update = () => {
   // Filter out dead characters
 
   characters.forEach((character, index) => {
-    if (character.hitPoints<= 0) {
+    if (character.hitPoints <= 0) {
       return;
     }
     const isActive: boolean = selectedIndex === index;
