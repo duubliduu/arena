@@ -4,6 +4,7 @@ import {
   moveToAngle,
   distanceTo,
   willCollide
+  isInReach
 } from "./helpers";
 import Position, { UP, RIGHT, DOWN, LEFT } from "./Position";
 import { Radians } from "./constants";
@@ -56,13 +57,28 @@ describe("distanceTo", () => {
 
 describe("willCollide", () => {
   it("should return true when characters are touching", () => {
-    const a = new Character;
-    const b = new Character;
+    const a = new Character();
+    const b = new Character();
     expect(willCollide(a, b)).toEqual(true);
   });
   it("should return true when characters are NOT touching", () => {
     const a = new Character(40);
-    const b = new Character;
+    const b = new Character();
     expect(willCollide(a, b)).toEqual(false);
+  });
+});
+
+describe("isInReach", () => {
+  it("should return true if target is in view and in reach", () => {
+    const a = new Character();
+    expect(isInReach(a, new Character())).toEqual(true);
+    // Default angle is towards to right
+    expect(isInReach(a, new Character(RIGHT))).toEqual(true);
+  });
+  it("should return false if target is not in reach or view", () => {
+    const a = new Character();
+    expect(isInReach(a, new Character(LEFT))).toEqual(false);
+    expect(isInReach(a, new Character(UP))).toEqual(false);
+    expect(isInReach(a, new Character(DOWN))).toEqual(false);
   });
 });

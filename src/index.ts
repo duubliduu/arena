@@ -5,6 +5,7 @@ import {
   willCollide,
   angleToTarget,
   calculateVelocity
+  isInReach,
 } from "./helpers";
 import { CONE_OF_SIGHT, TOUCH_RADIUS } from "./constants";
 import Character from "./Character";
@@ -197,20 +198,15 @@ const update = () => {
     let isColliding: boolean = false;
     let targetEnemy = null;
 
-    // Resolve collision
-    // Resolve target
+    // Resolve collision and target
     characters.forEach((enemy, enemyIndex) => {
       if (index !== enemyIndex && enemy.hitPoints > 0) {
-        const distanceToEnemy: number = distanceTo(
-          character.position,
-          enemy.position
-        );
-        const isInReach: boolean =
-          angleToTarget(character, enemy) <= 45 &&
-          distanceToEnemy <= character.reach;
-        if (isInReach && !character.coolDown) {
+        // Resolve target
+        if (isInReach(character, enemy) && !character.coolDown) {
           targetEnemy = enemy;
         }
+
+        // Resolve collision
         if (willCollide(character, enemy)) {
           isColliding = true;
         }

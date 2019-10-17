@@ -54,3 +54,8 @@ export const angleToTarget = (
   const angle = (character.angle * 180) / Math.PI;
   return 180 - Math.abs(Math.abs(angle - angleToEnemy) - 180);
 };
+
+export const isInReach = (a: Character, b: Character): boolean => {
+  const distanceToEnemy: number = distanceTo(a.position, b.position);
+  return angleToTarget(a, b) <= 45 && distanceToEnemy <= a.reach;
+};
