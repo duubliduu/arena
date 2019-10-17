@@ -6,17 +6,19 @@ import {
   angleToTarget,
   calculateVelocity,
   isInReach,
+  randomItem,
 } from "./helpers";
 import { CONE_OF_SIGHT, TOUCH_RADIUS } from "./constants";
 import Character from "./Character";
 import Vector, { ZERO } from "./Vector";
 import CharacterFactory from "./CharacterFactory";
-import { cachedDataVersionTag } from "v8";
 
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+
 let frameRate = 1;
 let updatedAt = +new Date();
+let selectedIndex: Character = null;
 
 const resize = () => {
   canvas.width = window.innerWidth;
@@ -25,27 +27,16 @@ const resize = () => {
 
 window.addEventListener("resize", resize);
 
-const randomPosition = (): Vector =>
-  new Vector(
-    Math.random() * window.innerWidth,
-    Math.random() * window.innerHeight,
-  );
+const randomPosition = (width: number, height: number): Vector =>
+  new Vector(Math.random() * width, Math.random() * height);
 
 const characters: Character[] = CharacterFactory.create(10);
 
 const setRandomPosition = () => {
   characters.forEach(character => {
-    character.position = randomPosition();
+    character.position = randomPosition(window.innerWidth, window.innerHeight);
   });
 };
-
-function randomItem<T>(items: T[], currentIndex): T {
-  let index = -1;
-  do {
-    index = Math.round(Math.random() * items.length);
-  } while (index === currentIndex);
-  return items[index];
-}
 
 const setRandomTarget = () => {
   characters.forEach((character, index) => {
@@ -53,35 +44,33 @@ const setRandomTarget = () => {
   });
 };
 
-let selectedIndex: number = -1;
-
 window.addEventListener("mouseup", event => {
   const target: Vector = new Vector(event.pageX, event.pageY);
-  let clickedIndex = -1;
+  let clickedIndex: Character = null;
 
-  characters.forEach((character, index) => {
+  characters.forEach(character => {
     if (
       distanceTo(character.position, target) <=
       character.size + TOUCH_RADIUS
     ) {
-      clickedIndex = index;
+      clickedIndex = character;
     }
   });
 
-  if (selectedIndex !== -1 && selectedIndex === clickedIndex) {
+  if (selectedIndex && selectedIndex === clickedIndex) {
     // Deselect currently selected character
-    selectedIndex = -1;
-  } else if (selectedIndex === -1 && clickedIndex !== -1) {
+    selectedIndex = null;
+  } else if (!selectedIndex && clickedIndex) {
     // Select this character
     selectedIndex = clickedIndex;
-  } else if (selectedIndex !== -1 && clickedIndex === -1) {
+  } else if (selectedIndex && !clickedIndex) {
     // Character is selected but clicked character is not clicked
     // Create character to this point as a target
-    characters[selectedIndex].target = target;
-  } else if (selectedIndex !== -1 && selectedIndex !== clickedIndex) {
+    selectedIndex.target = target;
+  } else if (selectedIndex && selectedIndex !== clickedIndex) {
     // Clicked character is not selected character
     // Set clicked character as a target
-    characters[selectedIndex].target = characters[clickedIndex].position;
+    selectedIndex.target = clickedIndex.position;
   }
 });
 
@@ -129,7 +118,7 @@ const drawCharacter = (character: Character, isActive: boolean = false) => {
   drawCircle(0, 0, size, isActive ? "red" : "black");
 
   // line
-  lineTo(new Vector(), new Vector(size));
+  lineTo(ZERO, new Vector(size));
 
   if (isActive) {
     // Danger Zone
@@ -144,20 +133,14 @@ const clearCanvas = () => {
 };
 
 const updateVisibility = () => {
-  const selectedCharacter = characters[selectedIndex];
-
-  characters.forEach((character, index) => {
-    if (selectedIndex === -1) {
+  characters.forEach(character => {
+    if (!selectedIndex) {
       character.isVisible = true;
-    } else if (selectedIndex !== index) {
-      const difference = angleToTarget(selectedCharacter, character);
+    } else if (selectedIndex !== character) {
+      const difference = angleToTarget(selectedIndex, character);
       character.isVisible = difference <= CONE_OF_SIGHT / 2;
     }
   });
-};
-
-const attackTarget = (attacker: Character, defender: Character) => {
-  console.log("BOOM");
 };
 
 const update = () => {
@@ -165,16 +148,19 @@ const update = () => {
   updatedAt = +new Date();
   frameRate = 1000 / tick; // frames per second
 
+  if (selectedIndex && selectedIndex.hitPoints <= 0) {
+    selectedIndex = null;
+  }
+
   clearCanvas();
   updateVisibility();
 
-  // Filter out dead characters
-
-  characters.forEach((character, index) => {
+  characters.forEach(character => {
+    // Filter out dead characters
     if (character.hitPoints <= 0) {
       return;
     }
-    const isActive: boolean = selectedIndex === index;
+    const isActive: boolean = selectedIndex === character;
     const reduction = 1 / frameRate;
 
     // reduce cool-down if any
@@ -199,8 +185,8 @@ const update = () => {
     let targetEnemy = null;
 
     // Resolve collision and target
-    characters.forEach((enemy, enemyIndex) => {
-      if (index !== enemyIndex && enemy.hitPoints > 0) {
+    characters.forEach(enemy => {
+      if (character !== enemy && enemy.hitPoints > 0) {
         // Resolve target
         if (isInReach(character, enemy) && !character.coolDown) {
           targetEnemy = enemy;

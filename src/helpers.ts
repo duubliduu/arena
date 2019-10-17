@@ -59,3 +59,11 @@ export const isInReach = (a: Character, b: Character): boolean => {
   const distanceToEnemy: number = distanceTo(a.position, b.position);
   return angleToTarget(a, b) <= 45 && distanceToEnemy <= a.reach;
 };
+
+export function randomItem<T>(items: T[], currentIndex): T {
+  let index = -1;
+  do {
+    index = Math.round(Math.random() * items.length);
+  } while (index === currentIndex);
+  return items[index];
+}
