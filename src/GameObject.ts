@@ -1,15 +1,15 @@
-import Position, {ZERO} from "./Position";
+import Vector, {ZERO} from "./Vector";
 import { Radians } from "./constants";
 
 class GameObject {
-  position: Position = ZERO;
+  position: Vector = ZERO;
   angle: number = Radians.RIGHT;
   isVisible: boolean = true;
-  velocity: Position = ZERO;
+  velocity: Vector = ZERO;
 
-  constructor(x: number | Position = 0, y: number = 0) {
+  constructor(x: number | Vector = 0, y: number = 0) {
     if (typeof x === "number") {
-      this.position = new Position(x, y);
+      this.position = new Vector(x, y);
     } else {
       this.position = x;
     }

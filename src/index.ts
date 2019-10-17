@@ -9,7 +9,7 @@ import {
 } from "./helpers";
 import { CONE_OF_SIGHT, TOUCH_RADIUS } from "./constants";
 import Character from "./Character";
-import Position, { ZERO } from "./Position";
+import Vector, { ZERO } from "./Vector";
 import CharacterFactory from "./CharacterFactory";
 import { cachedDataVersionTag } from "v8";
 
@@ -25,8 +25,8 @@ const resize = () => {
 
 window.addEventListener("resize", resize);
 
-const randomPosition = (): Position =>
-  new Position(
+const randomPosition = (): Vector =>
+  new Vector(
     Math.random() * window.innerWidth,
     Math.random() * window.innerHeight,
   );
@@ -56,7 +56,7 @@ const setRandomTarget = () => {
 let selectedIndex: number = -1;
 
 window.addEventListener("mouseup", event => {
-  const target: Position = new Position(event.pageX, event.pageY);
+  const target: Vector = new Vector(event.pageX, event.pageY);
   let clickedIndex = -1;
 
   characters.forEach((character, index) => {
@@ -85,7 +85,7 @@ window.addEventListener("mouseup", event => {
   }
 });
 
-const lineTo = (from: Position, to: Position) => {
+const lineTo = (from: Vector, to: Vector) => {
   ctx.beginPath();
   ctx.moveTo(from.x, from.y);
   ctx.lineTo(to.x, to.y);
@@ -129,7 +129,7 @@ const drawCharacter = (character: Character, isActive: boolean = false) => {
   drawCircle(0, 0, size, isActive ? "red" : "black");
 
   // line
-  lineTo(new Position(), new Position(size));
+  lineTo(new Vector(), new Vector(size));
 
   if (isActive) {
     // Danger Zone

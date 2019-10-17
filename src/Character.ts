@@ -1,4 +1,4 @@
-import Position from "./Position";
+import Vector from "./Vector";
 import { Radians } from "./constants";
 import GameObject from "./GameObject";
 import { calculateVelocity } from "./helpers";
@@ -6,7 +6,7 @@ import { calculateVelocity } from "./helpers";
 class Character extends GameObject {
   isActive: boolean = false;
   size: number = 8 + Math.ceil(Math.random() * 10);
-  target: Position = null;
+  target: Vector = null;
   coolDown: number = 0;
   arms = [
     {

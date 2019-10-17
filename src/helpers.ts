@@ -1,14 +1,14 @@
-import Position from "./Position";
+import Vector from "./Vector";
 import GameObject from "./GameObject";
 import Character from "./Character";
 
-export const angleRadians = (from: Position, to: Position): number => {
+export const angleRadians = (from: Vector, to: Vector): number => {
   const { x: x1, y: y1 } = from;
   const { x: x2, y: y2 } = to;
   return Math.atan2(y2 - y1, x2 - x1);
 };
 
-export const angleDegrees = (from: Position, to: Position): number => {
+export const angleDegrees = (from: Vector, to: Vector): number => {
   const { x: x1, y: y1 } = from;
   const { x: x2, y: y2 } = to;
   return (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
@@ -17,22 +17,22 @@ export const angleDegrees = (from: Position, to: Position): number => {
 export const calculateVelocity = (
   angle: number,
   distance: number
-): Position => {
-  return new Position(Math.cos(angle) * distance, Math.sin(angle) * distance);
+): Vector => {
+  return new Vector(Math.cos(angle) * distance, Math.sin(angle) * distance);
 };
 
 export const moveToAngle = (
-  position: Position,
+  position: Vector,
   angle: number,
   distance: number
-): Position => {
-  return new Position(
+): Vector => {
+  return new Vector(
     position.x + Math.cos(angle) * distance,
     position.y + Math.sin(angle) * distance
   );
 };
 
-export const distanceTo = (from: Position, to: Position) => {
+export const distanceTo = (from: Vector, to: Vector) => {
   const a = from.x - to.x;
   const b = from.y - to.y;
 

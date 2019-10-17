@@ -1,4 +1,4 @@
-class Position {
+class Vector {
   x: number = 0;
   y: number = 0;
 
@@ -11,7 +11,7 @@ class Position {
     return `${this.x}, ${this.y}`;
   }
 
-  add(position: Position) {
+  add(position: Vector) {
     this.x += position.x;
     this.y += position.y;
     return this;
@@ -19,7 +19,7 @@ class Position {
 
   clone() {
     const { x, y } = this;
-    return new Position(x, y);
+    return new Vector(x, y);
   }
 
   toArray() {
@@ -33,10 +33,10 @@ class Position {
   }
 }
 
-export const UP = new Position(0, -1);
-export const RIGHT = new Position(1, 0);
-export const DOWN = new Position(0, 1);
-export const LEFT = new Position(-1, 0);
-export const ZERO = new Position();
+export const UP = new Vector(0, -1);
+export const RIGHT = new Vector(1, 0);
+export const DOWN = new Vector(0, 1);
+export const LEFT = new Vector(-1, 0);
+export const ZERO = new Vector();
 
-export default Position;
+export default Vector;
